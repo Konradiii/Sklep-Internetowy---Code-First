@@ -16,6 +16,9 @@ public class ProduktConfiguration : IEntityTypeConfiguration<Produkt>
         
         builder.Property(p=>p.Cena)
             .HasColumnType("decimal(10,2)");
+        
+        builder.Property(p=>p.Znizka)
+            .HasColumnType("decimal(10,2)");
 
         builder.HasOne(p => p.Kategoria)
             .WithMany(k => k.Produkty)
