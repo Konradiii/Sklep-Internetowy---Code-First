@@ -8,6 +8,9 @@ public class Produkt
     public decimal? Znizka { get; set; }
     public int? IloscNaStanie { get; set; }
     
+    
+    public bool CzyAktywny { get; set; } = true; 
+    
     //Klucz obcy
     public int? Id_Kategoria { get; set; }
     
@@ -20,6 +23,4 @@ public class Produkt
 
     public List<Opinia> Opinie { get; set; } = new();
     
-
-
 }
