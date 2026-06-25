@@ -20,8 +20,7 @@
 
     <ItemGroup>
       <Folder Include="Controlers\" />
-      <Folder Include="DTOs\" />
-      <Folder Include="Services\" />
+      <Folder Include="DTOs\Cart\" />
     </ItemGroup>
 
 </Project>
