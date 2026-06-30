@@ -16,7 +16,7 @@ public class CategorieService(ShopDbContext ctx) : ICategorieService
                 Id_Kategoria = e.Id_Kategoria,
                 Nazwa = e.Nazwa
                 
-            }).ToListAsync();
+            }).ToListAsync(ct);
 
     }
 
@@ -53,6 +53,11 @@ public class CategorieService(ShopDbContext ctx) : ICategorieService
         {
             throw new NotFoundException($"Nie znaleziono kategori o id: {CategoryId}");
         }
+        
+        bool maProdukty = await ctx.Kategoria.AnyAsync(e => e.Id_Kategoria == CategoryId, ct);
+        if (maProdukty)
+            throw new ConflictException($"Nie można usunąć kategorii o id {CategoryId}, ma przypisane produkty.");
+        
         ctx.Kategoria.Remove(kategoria);
         await ctx.SaveChangesAsync(ct);
         
