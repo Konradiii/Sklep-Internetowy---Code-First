@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SklepGrovly;
+using SklepGrovly.Exceptions;
 using SklepGrovly.Services.Products;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // Rejestrujemy DbContext w kontenerze DI.
 // AddDbContext domyślnie używa cyklu życia Scoped.
@@ -31,5 +35,6 @@ if (app.Environment.IsDevelopment())
     
 }
 
+app.UseExceptionHandler();
 app.MapControllers();
 app.Run();

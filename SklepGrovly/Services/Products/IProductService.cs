@@ -12,5 +12,6 @@ public interface IProductService
     
     Task<int> ArchiveProduct(int productId, CancellationToken ct);
     
+    Task<List<GetProductDto>> GetArchiveProducts(int? kategoriaId, CancellationToken ct );    
     Task<List<GetOpinionOfProductDto>> GetOpinionsOfProduct(int productId, CancellationToken ct);
 }

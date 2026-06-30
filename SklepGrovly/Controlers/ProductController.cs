@@ -16,46 +16,43 @@ public class ProductController(IProductService service) : ControllerBase
     {
         return service.GetAllProducts(kategoriaId, ct);
     }
+    
+    
+    [HttpGet("GetArchiveProducts")]
+    public Task<List<GetProductDto>> GetArchiveProducts(int? kategoriaId, CancellationToken ct)
+    {
+            return service.GetArchiveProducts(kategoriaId, ct);
+    }
+
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetProduct(int id, CancellationToken ct)
     {
-        try
-        {
             return Ok(await service.GetProduct(id, ct));
-        }
-        catch (NotFoundException e)
-        {
-            return NotFound(e.Message);
-        }
+
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto dto, CancellationToken ct)
     {
-        try
-        {
             await service.CreateProduct(dto, ct);
             return Created();
-        }
-        catch (ConflictException e)
-        {
-            return Conflict(e.Message);
-        }
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> EditProduct(int id, [FromBody] EditProductDto dto, CancellationToken ct)
     {
-        try
-        {
             await service.EditProduct(id, dto, ct);
             return NoContent();
-        }
-        catch (NotFoundException e)
-        {
-            return NotFound(e.Message);
-        }
+    }
+
+    [HttpPatch("{productId:int}/archiwizujProdukt")]
+    public async Task<IActionResult> ArchiveProduct(int productId, CancellationToken ct)
+    {
+            await service.ArchiveProduct(productId, ct);
+            return NoContent();
+        
+     
     }
 
 }
