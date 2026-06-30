@@ -5,7 +5,9 @@ namespace SklepGrovly.Services.Products;
 public interface IProductService
 {
     Task<List<GetProductDto>> GetAllProducts(int? kategoriaId, CancellationToken ct );
+    
     Task<GetProductDetailsDto> GetProduct(int productId, CancellationToken ct );
+    
     Task<int> CreateProduct(CreateProductDto dto, CancellationToken ct );
     
     Task EditProduct(int productId, EditProductDto dto, CancellationToken ct);    
@@ -13,5 +15,6 @@ public interface IProductService
     Task<int> ArchiveProduct(int productId, CancellationToken ct);
     
     Task<List<GetProductDto>> GetArchiveProducts(int? kategoriaId, CancellationToken ct );    
+    
     Task<List<GetOpinionOfProductDto>> GetOpinionsOfProduct(int productId, CancellationToken ct);
 }

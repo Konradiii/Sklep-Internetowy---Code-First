@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SklepGrovly;
 using SklepGrovly.Exceptions;
+using SklepGrovly.Services.Categories;
 using SklepGrovly.Services.Products;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategorieService, CategorieService>();
+
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
