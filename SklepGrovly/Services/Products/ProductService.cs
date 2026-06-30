@@ -68,6 +68,22 @@ public class ProductService(ShopDbContext ctx) : IProductService
 
     public async Task EditProduct(int productId, EditProductDto dto, CancellationToken ct)
     {
+        var produkt = await ctx.Produkt
+            .FirstOrDefaultAsync(p => p.Id_Produkt == productId, ct);
+
+        if (produkt == null)
+        {
+            throw new NotFoundException($"Produkt o id {productId} nie istnieje.");
+        }
+        
+        produkt.Nazwa = dto.Nazwa;
+        produkt.Cena = dto.Cena;
+        produkt.Znizka = dto.Znizka;
+        produkt.IloscNaStanie = dto.IloscNaStanie;
+        produkt.Id_Kategoria = dto.Id_Kategoria;
+        
+        await ctx.SaveChangesAsync(ct);
+        
         
     }
 

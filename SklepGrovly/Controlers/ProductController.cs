@@ -44,4 +44,18 @@ public class ProductController(IProductService service) : ControllerBase
         }
     }
 
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> EditProduct(int id, [FromBody] EditProductDto dto, CancellationToken ct)
+    {
+        try
+        {
+            await service.EditProduct(id, dto, ct);
+            return NoContent();
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+    }
+
 }
