@@ -31,6 +31,12 @@ public class ProductController(IProductService service) : ControllerBase
             return Ok(await service.GetProduct(id, ct));
 
     }
+    
+    [HttpGet("{productId:int}/OpinionsOfProduct")]
+    public async Task<IActionResult> GetOpinionsOfProduct(int productId, CancellationToken ct)
+    {
+            return Ok(await service.GetOpinionsOfProduct(productId, ct));
+    }
 
     [HttpPost]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto dto, CancellationToken ct)
@@ -54,5 +60,6 @@ public class ProductController(IProductService service) : ControllerBase
         
      
     }
+    
 
 }

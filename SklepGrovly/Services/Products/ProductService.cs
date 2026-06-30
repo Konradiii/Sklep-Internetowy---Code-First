@@ -132,7 +132,28 @@ public class ProductService(ShopDbContext ctx) : IProductService
 
     public async Task<List<GetOpinionOfProductDto>> GetOpinionsOfProduct(int productId, CancellationToken ct)
     {
-        return null;
+        
+        var Opinia = ctx.Opinia.Where(p => p.Id_Produkt == productId).FirstOrDefault();
+
+        if (Opinia == null)
+        {
+            throw new NotFoundException($"Produkt o id {productId} nie istnieje.");
+        }
+
+        return await ctx.Opinia
+            .Where(p => p.Id_Produkt == productId)
+            .Select(e => new GetOpinionOfProductDto
+            {
+                Id_Opinia = e.Id_Opinia,
+                Ocena = e.Ocena,
+                Tresc = e.Tresc,
+                DataWystawienia = e.DataWystawienia
+
+
+            }).ToListAsync(ct);
+
+
+
     }
 
 
