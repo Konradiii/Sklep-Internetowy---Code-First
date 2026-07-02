@@ -62,7 +62,7 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
             issuer: config["Jwt:Issuer"],
             audience: config["Jwt:Issuer"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(3),
+            expires: DateTime.UtcNow.AddHours(3),git 
             signingCredentials: creds);
         
         return new JwtSecurityTokenHandler().WriteToken(token);
