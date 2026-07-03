@@ -40,11 +40,67 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
         
         var osoba = await ctx.Osoba
                 .FirstOrDefaultAsync(o => o.Email == user.Email, ct);
+        
         if (osoba == null || !BCrypt.Net.BCrypt.Verify(user.Haslo,osoba.Haslo))
         {
             throw new UnauthorizedException("Nieprawidłowy email lub hasło.");
         }
+        
+        var accessToken = GenerateAccessToken(osoba);
+        var refreshToken = GenerateAndStoreRefreshToken(osoba.Id_Osoba);
+        await ctx.SaveChangesAsync(ct);
 
+
+        return new LoginResponseDto{
+            AccessToken =  accessToken,
+            RefreshToken =  refreshToken
+        };
+        
+    }
+    
+    
+
+    public async Task<RefreshResponseDto> RefreshTokenAsync(string token, CancellationToken ct)
+    {
+        var hash = HashToken(token);
+        
+        var stary = await ctx.RefreshToken
+            .Include(rt => rt.Osoba)
+            .FirstOrDefaultAsync(rt => rt.TokenHash == hash, ct);
+        if (stary == null)
+        {
+            throw new UnauthorizedException("Nieprawidłowy token");
+        }
+
+        if (stary.RevokedAt != null)
+        {
+            throw new UnauthorizedException("Token zostal juz wykorzystany.");
+        }
+
+        if (stary.ExpiresAt <= DateTime.UtcNow)
+        {
+            throw new UnauthorizedException("Token wygasł.");
+        }
+        
+        stary.RevokedAt = DateTime.UtcNow;
+        
+        var accessToken = GenerateAccessToken(stary.Osoba);
+        var refreshToken = GenerateAndStoreRefreshToken(stary.Id_Osoba);
+        
+        await ctx.SaveChangesAsync(ct);
+        return new RefreshResponseDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
+        };
+
+
+    }
+
+
+    private string GenerateAccessToken(Osoba osoba)
+    {
+        
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, osoba.Id_Osoba.ToString()),
@@ -53,7 +109,6 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
             
         };
         
-        //// klucz do podpisu (z konfiguracji / user-secrets)
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -65,32 +120,30 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: creds);
-        
-        var refresh_token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-        var refreshTokenHash = Convert.ToHexString(
-            SHA256.HashData(Encoding.UTF8.GetBytes(refresh_token)));
 
-        ctx.RefreshToken.Add(new RefreshToken
-        {
+        return new JwtSecurityTokenHandler().WriteToken(access_token);
 
-            TokenHash =  refreshTokenHash,
-            CreatedAt = DateTime.UtcNow,
-            ExpiresAt = DateTime.UtcNow.AddDays(15),
-            Id_Osoba = osoba.Id_Osoba,
-        });
-        await ctx.SaveChangesAsync(ct);
 
-        return new LoginResponseDto{
-            AccessToken =  new JwtSecurityTokenHandler().WriteToken(access_token),
-            RefreshToken =  refresh_token
-        };
     }
     
     
-
-    public async Task<string> RefreshToken(string token, CancellationToken ct)
+    private string HashToken(string rawToken)
+        => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(rawToken)));
+    
+    
+    
+    
+    private string GenerateAndStoreRefreshToken(int osobaId)
     {
-        return null;
+        var rawToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+        ctx.RefreshToken.Add(new RefreshToken
+        {
+            TokenHash = HashToken(rawToken),  
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddDays(15),
+            Id_Osoba = osobaId,
+        });
+        return rawToken; 
     }
     
     
