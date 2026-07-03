@@ -12,4 +12,6 @@ public abstract class Osoba
     
     public int Wiek => DateTime.Now.Year - DataUrodzenia.Year;
     
+    public ICollection<RefreshToken> RefreshTokens {get; set;} = new List<RefreshToken>();
+    
 }

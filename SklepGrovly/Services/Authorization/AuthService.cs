@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -34,7 +35,7 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
         await ctx.SaveChangesAsync(ct);
     }
 
-    public async Task<string> LoginUser(LoginUserDto user, CancellationToken ct)
+    public async Task<LoginResponseDto> LoginUser(LoginUserDto user, CancellationToken ct)
     {
         
         var osoba = await ctx.Osoba
@@ -58,15 +59,44 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
 
-        var token = new JwtSecurityToken(
+        var access_token = new JwtSecurityToken(
             issuer: config["Jwt:Issuer"],
             audience: config["Jwt:Issuer"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(3),
+            expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: creds);
         
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var refresh_token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+        var refreshTokenHash = Convert.ToHexString(
+            SHA256.HashData(Encoding.UTF8.GetBytes(refresh_token)));
+
+        ctx.RefreshToken.Add(new RefreshToken
+        {
+
+            TokenHash =  refreshTokenHash,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddDays(15),
+            Id_Osoba = osoba.Id_Osoba,
+        });
+        await ctx.SaveChangesAsync(ct);
+
+        return new LoginResponseDto{
+            AccessToken =  new JwtSecurityTokenHandler().WriteToken(access_token),
+            RefreshToken =  refresh_token
+        };
     }
+    
+    
+
+    public async Task<string> RefreshToken(string token, CancellationToken ct)
+    {
+        return null;
+    }
+    
+    
+    
+    
+    
 
     public async Task<UserDetailsDto> GetUserDetails(int userId, CancellationToken ct)
     {

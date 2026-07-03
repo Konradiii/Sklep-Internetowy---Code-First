@@ -22,6 +22,7 @@ public class ShopDbContext : DbContext
     public DbSet<PozycjaWZamowieniu> PozycjeWZamowieniu { get; set; }
     public DbSet<Platnosc> Platnosc { get; set; }
     public DbSet<Opinia> Opinia { get; set; }
+    public DbSet<RefreshToken> RefreshToken { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
