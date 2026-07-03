@@ -11,5 +11,6 @@ public interface IAuthService
     Task<UserDetailsDto> GetUserDetails(int userId, CancellationToken ct);
     Task<UserDetailsDto> EditUserDetails(EditUserDetailsDto dto,CancellationToken ct); // Na pozniej
     Task ChangePassword(ChangePasswordDto dto, CancellationToken ct); // Na pozniej
+    Task Logout(LogoutDto dto, CancellationToken ct);
     
 }

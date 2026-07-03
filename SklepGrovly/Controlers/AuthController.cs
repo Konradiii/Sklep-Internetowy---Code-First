@@ -11,7 +11,7 @@ namespace SklepGrovly.Controlers;
 [Route("api/[controller]")]
 public class AuthController(IAuthService service) : ControllerBase
 {
-    
+
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<IActionResult> LoginUser(LoginUserDto user, CancellationToken ct)
@@ -41,8 +41,16 @@ public class AuthController(IAuthService service) : ControllerBase
     public async Task<IActionResult> RefreshToken(RefreshReqDto dto, CancellationToken ct)
     {
         var result = await service.RefreshTokenAsync(dto.RefreshToken, ct);
-        return  Ok(result);
+        return Ok(result);
     }
-    
-    
+
+    [HttpPost("logout")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Logout(LogoutDto dto, CancellationToken ct)
+    {
+        await service.Logout(dto, ct);
+        return Ok();
+    }
+
+
 }

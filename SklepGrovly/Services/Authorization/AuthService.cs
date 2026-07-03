@@ -175,5 +175,18 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
         return null;
     }
 
+    public async Task Logout(LogoutDto dto, CancellationToken ct)
+    {
+        var hash = HashToken(dto.RefreshToken);
+        
+        var refresh_Token = await ctx.RefreshToken
+            .FirstOrDefaultAsync(r=> r.TokenHash == hash, ct);
+
+        refresh_Token.RevokedAt = DateTime.UtcNow;
+        
+        await ctx.SaveChangesAsync(ct);
+        
+    }
+
     
 }
