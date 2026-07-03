@@ -62,10 +62,34 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
             issuer: config["Jwt:Issuer"],
             audience: config["Jwt:Issuer"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(3),git 
+            expires: DateTime.UtcNow.AddHours(3),
             signingCredentials: creds);
         
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public async Task<UserDetailsDto> GetUserDetails(int userId, CancellationToken ct)
+    {
+        return await ctx.Osoba
+            .Where(o => o.Id_Osoba == userId)
+            .Select(o => new UserDetailsDto
+            {
+                Imie = o.Imie,
+                Nazwisko = o.Nazwisko,
+                Email = o.Email,
+                NrTelefonu = o.NrTelefonu
+            })
+            .FirstOrDefaultAsync(ct);
+    }
+    
+    public Task<UserDetailsDto> EditUserDetails(EditUserDetailsDto dto,CancellationToken ct)
+    {
+        return null;
+    }
+
+    public Task ChangePassword(ChangePasswordDto dto, CancellationToken ct)
+    {
+        return null;
     }
 
     

@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using SklepGrovly;
 using SklepGrovly.Exceptions;
+using SklepGrovly.Services.Authorization;
 using SklepGrovly.Services.Categories;
 using SklepGrovly.Services.Products;
 
@@ -38,6 +39,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategorieService, CategorieService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
