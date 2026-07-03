@@ -181,6 +181,9 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
         
         var refresh_Token = await ctx.RefreshToken
             .FirstOrDefaultAsync(r=> r.TokenHash == hash, ct);
+        
+        if (refresh_Token == null || refresh_Token.RevokedAt != null)
+            return;
 
         refresh_Token.RevokedAt = DateTime.UtcNow;
         

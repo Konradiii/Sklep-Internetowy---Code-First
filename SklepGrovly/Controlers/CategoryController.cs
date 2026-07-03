@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SklepGrovly.DTOs.Categories;
 using SklepGrovly.Services.Categories;
 
@@ -8,6 +9,7 @@ namespace SklepGrovly.Controlers;
 public class CategoryController(ICategorieService service) : ControllerBase
 {
     [HttpGet("GetAllCategories")]
+    [AllowAnonymous]
     public async Task<List<GetCategoriesDto>> GetAllCategories(CancellationToken ct)
     {
         var result = await service.GetAllCategories(ct);
@@ -15,6 +17,7 @@ public class CategoryController(ICategorieService service) : ControllerBase
     }
 
     [HttpPost("AddCategory")]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> AddCategory(AddCategoryDto dto, CancellationToken ct)
     {
         await service.AddCategory(dto, ct);
@@ -22,6 +25,7 @@ public class CategoryController(ICategorieService service) : ControllerBase
     }
 
     [HttpPut("{categoryId:int}/UpdateCategory")]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> UpdateCategory(int categoryId ,EditCategoryDto dto, CancellationToken ct)
     {
         await service.EditCategory(categoryId, dto, ct);
@@ -30,6 +34,7 @@ public class CategoryController(ICategorieService service) : ControllerBase
     }
 
     [HttpDelete("{categoryId:int}/DeleteCategory")]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> DeleteCategory(int categoryId, CancellationToken ct)
     {
         await service.DeleteCategory(categoryId, ct);
