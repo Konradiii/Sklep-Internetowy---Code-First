@@ -13,4 +13,5 @@ public class UserDetailsDto
     
     public string NrTelefonu { get; set; }
     
+    
 }

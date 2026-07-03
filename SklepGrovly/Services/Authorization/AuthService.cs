@@ -161,6 +161,7 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
                 Nazwisko = o.Nazwisko,
                 Email = o.Email,
                 NrTelefonu = o.NrTelefonu
+                
             })
             .FirstOrDefaultAsync(ct);
     }
