@@ -57,8 +57,8 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
         };
         
     }
-    
-    
+
+
 
     public async Task<RefreshResponseDto> RefreshTokenAsync(string token, CancellationToken ct)
     {
@@ -98,7 +98,7 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
     }
 
 
-    private string GenerateAccessToken(Osoba osoba)
+    public string GenerateAccessToken(Osoba osoba)
     {
         
         var claims = new List<Claim>
@@ -127,7 +127,7 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
     }
     
     
-    private string HashToken(string rawToken)
+    public string HashToken(string rawToken)
         => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(rawToken)));
     
     

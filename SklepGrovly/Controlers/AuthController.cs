@@ -17,7 +17,7 @@ public class AuthController(IAuthService service) : ControllerBase
     public async Task<IActionResult> LoginUser(LoginUserDto user, CancellationToken ct)
     {
         var token = await service.LoginUser(user, ct);
-        return Ok(new { token });
+        return Ok(token);
     }
 
     [HttpPost("register")]
@@ -34,6 +34,14 @@ public class AuthController(IAuthService service) : ControllerBase
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
         return Ok(await service.GetUserDetails(userId, ct));
+    }
+
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    public async Task<IActionResult> RefreshToken(RefreshReqDto dto, CancellationToken ct)
+    {
+        var result = await service.RefreshTokenAsync(dto.RefreshToken, ct);
+        return  Ok(result);
     }
     
     
