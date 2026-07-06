@@ -18,7 +18,7 @@ public interface IOrderService
     
     Task ChangeOrderStatus(int id, StatusZamowienia nowyStatus, CancellationToken ct);
 
-    Task CancelOrder(int id, CancellationToken ct);
+    Task CancelOrder(int id,int klientId, bool isAdmin, CancellationToken ct);
 
     
     

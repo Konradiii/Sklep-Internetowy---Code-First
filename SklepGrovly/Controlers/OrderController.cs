@@ -74,4 +74,15 @@ public class OrderController(IOrderService service) : ControllerBase
         await service.ChangeOrderStatus(id, nowyStatus, ct);
         return NoContent();
     }
+    
+    [HttpPatch("{id:int}/anulowanie")]
+    [Authorize]
+    [EndpointSummary("Anuluj zamówienie")]
+    public async Task<IActionResult> CancelOrder(int id, CancellationToken ct)
+    {
+        var klientId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var isAdmin = User.IsInRole("Administrator");
+        await service.CancelOrder(id, klientId, isAdmin, ct);
+        return NoContent();
+    }
 }

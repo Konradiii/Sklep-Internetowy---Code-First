@@ -163,9 +163,41 @@ public class OrderService(ShopDbContext ctx) : IOrderService
         }
         
 
-        public async Task CancelOrder(int id, CancellationToken ct)
+        public async Task CancelOrder(int id, int klientId, bool isAdmin, CancellationToken ct)
         {
             
+            var zamowienie = await ctx.Zamowienie
+                .Include(p => p.PozycjaWZamowieniu)
+                .FirstOrDefaultAsync(p => p.Id_Zamowienie == id, ct);
+            
+            if (zamowienie == null)
+                throw new NotFoundException("Nie ma takiego zamowienia.");
+            
+            if (!isAdmin && zamowienie.Id_Klient != klientId)
+                throw new NotFoundException("Nie ma takiego zamówienia.");
+            
+            if (zamowienie.Status == StatusZamowienia.Anulowane)
+                throw new ConflictException("Zamówienie jest już anulowane.");
+            
+            if (zamowienie.Status == StatusZamowienia.Wyslane || 
+                zamowienie.Status == StatusZamowienia.Dostarczone)
+                throw new ConflictException("Nie można anulować wysłanego zamówienia.");
+
+            foreach (var poz in zamowienie.PozycjaWZamowieniu)
+            {
+                var produkt = await ctx.Produkt
+                    .FirstOrDefaultAsync(p => p.Id_Produkt == poz.Id_Produkt, ct);
+                if (produkt != null)
+                {
+                    produkt.IloscNaStanie += poz.Ilosc;
+                }
+                
+            }
+            
+
+            zamowienie.Status = StatusZamowienia.Anulowane;
+            await ctx.SaveChangesAsync(ct);
+
         }
 
 
