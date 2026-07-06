@@ -9,11 +9,14 @@ namespace SklepGrovly.Controlers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Tags("Autoryzacja")]
 public class AuthController(IAuthService service) : ControllerBase
 {
 
     [HttpPost("login")]
     [AllowAnonymous]
+    [EndpointSummary("Logowanie")]
+    [EndpointDescription("Zwraca access token i refresh token.")]
     public async Task<IActionResult> LoginUser(LoginUserDto user, CancellationToken ct)
     {
         var token = await service.LoginUser(user, ct);
@@ -22,6 +25,7 @@ public class AuthController(IAuthService service) : ControllerBase
 
     [HttpPost("register")]
     [AllowAnonymous]
+    [EndpointSummary("Rejestracja nowego klienta")]
     public async Task<IActionResult> RegisterUser(RegisterUserDto user, CancellationToken ct)
     {
         await service.RegisterUser(user, ct);
@@ -30,6 +34,7 @@ public class AuthController(IAuthService service) : ControllerBase
 
     [HttpGet("me")]
     [Authorize]
+    [EndpointSummary("Dane zalogowanego użytkownika")]
     public async Task<IActionResult> GetUserDetails(CancellationToken ct)
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -38,6 +43,8 @@ public class AuthController(IAuthService service) : ControllerBase
 
     [HttpPost("refresh")]
     [AllowAnonymous]
+    [EndpointSummary("Odświeżenie tokenu")]
+    [EndpointDescription("Wymienia ważny refresh token na nową parę tokenów (rotacja).")]
     public async Task<IActionResult> RefreshToken(RefreshReqDto dto, CancellationToken ct)
     {
         var result = await service.RefreshTokenAsync(dto.RefreshToken, ct);
@@ -46,6 +53,8 @@ public class AuthController(IAuthService service) : ControllerBase
 
     [HttpPost("logout")]
     [AllowAnonymous]
+    [EndpointSummary("Wylogowanie")]
+    [EndpointDescription("Unieważnia refresh token.")]
     public async Task<IActionResult> Logout(LogoutDto dto, CancellationToken ct)
     {
         await service.Logout(dto, ct);

@@ -4,6 +4,7 @@ namespace SklepGrovly.DTOs.Orders;
 
 public class OrderDetailsDto
 {
+    public int Id_Klient { get; set; }
     public int Id_Zamowienie { get; set; }
     public DateTime DataZamowienia { get; set; }
     public StatusZamowienia Status { get; set; }

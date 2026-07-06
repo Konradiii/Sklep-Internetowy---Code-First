@@ -8,8 +8,8 @@ namespace SklepGrovly.Services.Orders;
 
 public class OrderService(ShopDbContext ctx) : IOrderService
 {
-    
-    
+
+
     public async Task<OrderConfirmationDto> PlaceOrder(int klientId, PlaceOrderDto dto, CancellationToken ct)
     {
 
@@ -22,12 +22,12 @@ public class OrderService(ShopDbContext ctx) : IOrderService
         };
 
         var pozycjeDto = new List<OrderItemConfirmationDto>();
-        
+
         foreach (var pozycja in dto.Pozycje)
         {
-            
+
             var produkt = await ctx.Produkt
-                .FirstOrDefaultAsync(p=> p.Id_Produkt == pozycja.Id_Produkt, ct);
+                .FirstOrDefaultAsync(p => p.Id_Produkt == pozycja.Id_Produkt, ct);
 
             if (produkt == null)
             {
@@ -51,8 +51,8 @@ public class OrderService(ShopDbContext ctx) : IOrderService
                 CenaZakupu = produkt.Cena,
                 Id_Produkt = produkt.Id_Produkt,
             });
-            
-            
+
+
             pozycjeDto.Add(new OrderItemConfirmationDto
             {
                 Id_Produkt = produkt.Id_Produkt,
@@ -61,42 +61,112 @@ public class OrderService(ShopDbContext ctx) : IOrderService
                 CenaJednostkowa = produkt.Cena,
                 CenaPozycji = produkt.Cena * pozycja.Ilosc,
             });
-            
-            produkt.IloscNaStanie -=  pozycja.Ilosc ;
-            
+
+            produkt.IloscNaStanie -= pozycja.Ilosc;
+
         }
+
         ctx.Zamowienie.Add(noweZamowienie);
         await ctx.SaveChangesAsync(ct);
-        
+
         return new OrderConfirmationDto
         {
             Id_Zamowienie = noweZamowienie.Id_Zamowienie,
             DataZamowienia = noweZamowienie.DataZamowienia,
             Status = noweZamowienie.Status,
             Pozycje = pozycjeDto,
-            SumaCalkowita = pozycjeDto.Sum(p=> p.CenaPozycji)
+            SumaCalkowita = pozycjeDto.Sum(p => p.CenaPozycji)
         };
+    }
+
+    public async Task<List<OrderListItemDto>> GetAllOrdersByClient(int klientId, CancellationToken ct)
+    {
+        var lista = await ctx.Zamowienie
+            .Where(p => p.Id_Klient == klientId)
+            .Select(p => new OrderListItemDto
+            {
+                Id_Zamowienie = p.Id_Zamowienie,
+                DataZamowienia = p.DataZamowienia,
+                Status = p.Status,
+                SumaCalkowita = p.PozycjaWZamowieniu.Sum(p=> p.Ilosc * p.CenaZakupu)
+            }).ToListAsync(ct);
+        
+        return lista;
     }
 
     public async Task<List<OrderListItemDto>> GetAllOrders(CancellationToken ct)
     {
-        return null;
-    }
-
-    public async Task<OrderDetailsDto> GetOrderDetails(int id, CancellationToken ct)
-    {
-        return null;
-    }
-
-    public async Task ChangeOrderStatus(int id, StatusZamowienia nowyStatus, CancellationToken ct)
-    {
         
+        var lista = await ctx.Zamowienie
+            .Select(z => new OrderListItemDto
+            {
+                Id_Zamowienie = z.Id_Zamowienie,
+                DataZamowienia = z.DataZamowienia,
+                Status = z.Status,
+                SumaCalkowita = z.PozycjaWZamowieniu.Sum(p=>p.CenaZakupu * p.Ilosc)
+            }).ToListAsync(ct);
+        return lista;
     }
 
-    public async Task CancelOrder(int id, CancellationToken ct)
-    {
+
+
+
+    public async Task<OrderDetailsDto> GetOrderDetails(int id, int klientId, bool isAdmin, CancellationToken ct)
+            {
+                var zamowienie = await ctx.Zamowienie
+                    .Where(p => p.Id_Zamowienie == id)
+                    .Select(p=> new OrderDetailsDto
+                    {
+                        
+                        Id_Klient = p.Id_Klient,
+                        Id_Zamowienie = p.Id_Zamowienie,
+                        DataZamowienia = p.DataZamowienia,
+                        Status = p.Status,
+                        Pozycje = p.PozycjaWZamowieniu.Select(poz=>new OrderItemDto
+                        {
+                            Id_Produkt = poz.Id_Produkt,
+                            NazwaProduktu = poz.Produkt.Nazwa,
+                            Ilosc = poz.Ilosc,
+                            CenaJednostkowa = poz.CenaZakupu,
+                            CenaPozycji = poz.CenaZakupu * poz.Ilosc
+                        }).ToList(),
+                        SumaCalkowita = p.PozycjaWZamowieniu.Sum(z=> z.Ilosc* z.CenaZakupu)
+                        
+                        
+                    })
+                    .FirstOrDefaultAsync(ct);
+
+                if (zamowienie  == null)
+                {
+                    throw new NotFoundException("Nie ma takiego zamowienia.");
+                }
+
+                if (!isAdmin && zamowienie.Id_Klient != klientId)
+                {
+                    throw new NotFoundException("Nie ma takiego zamowienia.");
+                }
+
+                return zamowienie;
+            }
+
+        public async Task ChangeOrderStatus(int id, StatusZamowienia nowyStatus, CancellationToken ct)
+        {
+            var zamowienie = await ctx.Zamowienie
+                .FirstOrDefaultAsync(p => p.Id_Zamowienie == id, ct);
+            if (zamowienie == null)
+            {
+                throw new NotFoundException("Nie ma takiego zamowienia.");
+            }
+
+            zamowienie.Status = nowyStatus;
+            await ctx.SaveChangesAsync(ct);
+        }
         
-    }
+
+        public async Task CancelOrder(int id, CancellationToken ct)
+        {
+            
+        }
 
 
     
