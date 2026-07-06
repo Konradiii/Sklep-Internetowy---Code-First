@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,6 +8,7 @@ using SklepGrovly;
 using SklepGrovly.Exceptions;
 using SklepGrovly.Services.Authorization;
 using SklepGrovly.Services.Categories;
+using SklepGrovly.Services.Orders;
 using SklepGrovly.Services.Products;
 
 
@@ -73,6 +75,7 @@ builder.Services.AddSwaggerGen(opt =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategorieService, CategorieService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -87,6 +90,9 @@ builder.Services.AddDbContext<ShopDbContext>(options =>
         builder.Configuration.GetConnectionString("Default"));
 
 });
+
+builder.Services.AddControllers()
+    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 
 var app = builder.Build();

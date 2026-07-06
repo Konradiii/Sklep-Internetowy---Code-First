@@ -6,7 +6,7 @@ namespace SklepGrovly.Services.Orders;
 public interface IOrderService
 {
 
-    Task<OrderConfirmationDto> PlaceOrder(PlaceOrderDto dto, CancellationToken ct);
+    Task<OrderConfirmationDto> PlaceOrder(int klientId, PlaceOrderDto dto, CancellationToken ct);
     
     Task<List<OrderListItemDto>> GetAllOrders(CancellationToken ct);
 

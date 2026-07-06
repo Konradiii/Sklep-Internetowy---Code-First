@@ -9,4 +9,5 @@ public class PlaceOrderItemsDto
 
     [Range(1, int.MaxValue, ErrorMessage = "Ilość musi być co najmniej 1.")]
     public int Ilosc { get; set; }
+    
 }
