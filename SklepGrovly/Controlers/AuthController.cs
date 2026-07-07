@@ -61,5 +61,24 @@ public class AuthController(IAuthService service) : ControllerBase
         return Ok();
     }
 
+    [HttpPut("me")]
+    [Authorize]
+    [EndpointSummary("Edytuj moje dane")]
+    public async Task<IActionResult> EditUserDetails(EditUserDetailsDto dto, CancellationToken ct)
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        await service.EditUserDetails(userId, dto, ct);
+        return Ok();
+    }
+    
+    [HttpPut("me/haslo")]
+    [Authorize]
+    [EndpointSummary("Zmień hasło")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordDto dto, CancellationToken ct)
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        await service.ChangePassword(userId, dto, ct);
+        return NoContent();
+    }
 
 }

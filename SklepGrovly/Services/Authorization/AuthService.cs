@@ -14,7 +14,7 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
 {
     public async Task RegisterUser(RegisterUserDto user, CancellationToken ct)
     {
-        
+
         bool emailZajety = await ctx.Osoba
             .AnyAsync(o => o.Email == user.Email, ct);
 
@@ -30,32 +30,33 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
             NrTelefonu = user.NrTelefonu,
 
         };
-        
+
         ctx.Add(nowyUzytkownik);
         await ctx.SaveChangesAsync(ct);
     }
 
     public async Task<LoginResponseDto> LoginUser(LoginUserDto user, CancellationToken ct)
     {
-        
+
         var osoba = await ctx.Osoba
-                .FirstOrDefaultAsync(o => o.Email == user.Email, ct);
-        
-        if (osoba == null || !BCrypt.Net.BCrypt.Verify(user.Haslo,osoba.Haslo))
+            .FirstOrDefaultAsync(o => o.Email == user.Email, ct);
+
+        if (osoba == null || !BCrypt.Net.BCrypt.Verify(user.Haslo, osoba.Haslo))
         {
             throw new UnauthorizedException("Nieprawidłowy email lub hasło.");
         }
-        
+
         var accessToken = GenerateAccessToken(osoba);
         var refreshToken = GenerateAndStoreRefreshToken(osoba.Id_Osoba);
         await ctx.SaveChangesAsync(ct);
 
 
-        return new LoginResponseDto{
-            AccessToken =  accessToken,
-            RefreshToken =  refreshToken
+        return new LoginResponseDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
         };
-        
+
     }
 
 
@@ -63,7 +64,7 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
     public async Task<RefreshResponseDto> RefreshTokenAsync(string token, CancellationToken ct)
     {
         var hash = HashToken(token);
-        
+
         var stary = await ctx.RefreshToken
             .Include(rt => rt.Osoba)
             .FirstOrDefaultAsync(rt => rt.TokenHash == hash, ct);
@@ -81,12 +82,12 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
         {
             throw new UnauthorizedException("Token wygasł.");
         }
-        
+
         stary.RevokedAt = DateTime.UtcNow;
-        
+
         var accessToken = GenerateAccessToken(stary.Osoba);
         var refreshToken = GenerateAndStoreRefreshToken(stary.Id_Osoba);
-        
+
         await ctx.SaveChangesAsync(ct);
         return new RefreshResponseDto
         {
@@ -100,15 +101,15 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
 
     public string GenerateAccessToken(Osoba osoba)
     {
-        
+
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, osoba.Id_Osoba.ToString()),
             new(ClaimTypes.Email, osoba.Email),
             new(ClaimTypes.Role, osoba is Administrator ? "Administrator" : "Klient")
-            
+
         };
-        
+
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -125,31 +126,31 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
 
 
     }
-    
-    
+
+
     public string HashToken(string rawToken)
         => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(rawToken)));
-    
-    
-    
-    
+
+
+
+
     private string GenerateAndStoreRefreshToken(int osobaId)
     {
         var rawToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         ctx.RefreshToken.Add(new RefreshToken
         {
-            TokenHash = HashToken(rawToken),  
+            TokenHash = HashToken(rawToken),
             CreatedAt = DateTime.UtcNow,
             ExpiresAt = DateTime.UtcNow.AddDays(15),
             Id_Osoba = osobaId,
         });
-        return rawToken; 
+        return rawToken;
     }
-    
-    
-    
-    
-    
+
+
+
+
+
 
     public async Task<UserDetailsDto> GetUserDetails(int userId, CancellationToken ct)
     {
@@ -161,19 +162,35 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
                 Nazwisko = o.Nazwisko,
                 Email = o.Email,
                 NrTelefonu = o.NrTelefonu
-                
+
             })
             .FirstOrDefaultAsync(ct);
     }
-    
-    public Task<UserDetailsDto> EditUserDetails(EditUserDetailsDto dto,CancellationToken ct)
-    {
-        return null;
-    }
 
-    public Task ChangePassword(ChangePasswordDto dto, CancellationToken ct)
+public async Task ChangePassword(int userId, ChangePasswordDto dto, CancellationToken ct)
     {
-        return null;
+        
+        var user = await ctx.Osoba.FirstOrDefaultAsync(o => o.Id_Osoba == userId, ct);
+        
+        if (user == null)
+            throw new  NotFoundException("Nie znaleziono user");
+        if(!BCrypt.Net.BCrypt.Verify(dto.StareHaslo,user.Haslo))
+            throw new  UnauthorizedException("Nieprawidlowe obecne haslo");
+        
+        user.Haslo = BCrypt.Net.BCrypt.HashPassword(dto.NoweHaslo, workFactor: 12);
+        
+        
+        
+        var aktywneTokeny = await ctx.RefreshToken
+            .Where(rt => rt.Id_Osoba == userId && rt.RevokedAt == null)
+            .ToListAsync(ct);
+        
+        foreach (var token in aktywneTokeny)
+            token.RevokedAt = DateTime.UtcNow;
+        
+        await ctx.SaveChangesAsync(ct);
+        
+        
     }
 
     public async Task Logout(LogoutDto dto, CancellationToken ct)
@@ -189,6 +206,21 @@ public class AuthService(ShopDbContext ctx, IConfiguration config) : IAuthServic
         refresh_Token.RevokedAt = DateTime.UtcNow;
         
         await ctx.SaveChangesAsync(ct);
+        
+    }
+
+    public async Task EditUserDetails(int userId ,EditUserDetailsDto dto, CancellationToken ct)
+    {
+        var user = await ctx.Osoba.FirstOrDefaultAsync(o => o.Id_Osoba == userId, ct);
+        
+        
+        if (user == null)
+            throw new NotFoundException("Nie znaleziono użytkownika.");
+        
+        user.NrTelefonu = dto.NrTelefonu;
+        
+        await ctx.SaveChangesAsync(ct);
+        
         
     }
 
