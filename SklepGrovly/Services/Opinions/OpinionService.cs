@@ -11,13 +11,14 @@ public class OpinionService(ShopDbContext ctx) : IOpinionService
     public async Task CreateOpinion(int klientId, CreateOpinionDto dto, CancellationToken ct)
     {
 
-        var zamowienie = await ctx.Zamowienie
+        var kupil = await ctx.Zamowienie
             .Where(e => e.Status == StatusZamowienia.Dostarczone)
             .Where(e => e.Id_Klient == klientId)
             .Where(p => p.PozycjaWZamowieniu.Any(e => e.Id_Produkt == dto.Id_Produkt))
             .AnyAsync(ct);
 
-        if (zamowienie == null)
+        
+        if (!kupil)
         {
             throw new ConflictException("Możesz ocenić tylko produkt, który kupiłeś.");
         }

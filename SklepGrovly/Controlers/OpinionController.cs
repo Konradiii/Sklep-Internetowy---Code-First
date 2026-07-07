@@ -16,19 +16,19 @@ public class OpinionController(IOpinionService service) : ControllerBase
     [EndpointSummary("Wystaw opinię")]
     public async Task<IActionResult> CreateOpinion(CreateOpinionDto dto, CancellationToken ct)
     {
-        var id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        await service.CreateOpinion(id, dto, ct);
+        var idOpinii = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        await service.CreateOpinion(idOpinii, dto, ct);
         return Created();
     }
     
     [HttpPut("{id:int}")]
     [Authorize]
     [EndpointSummary("Edytuj opinię")]
-    public async Task<IActionResult> EditOpinion(int id, EditOpinionDto dto, CancellationToken ct)
+    public async Task<IActionResult> EditOpinion(int idOpinii, EditOpinionDto dto, CancellationToken ct)
     {
         var klientId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
         var isAdmin = User.IsInRole("Administrator");   // ← "Administrator", nie "Admin"
-        await service.EditOpinion(id, klientId, isAdmin, dto, ct);
+        await service.EditOpinion(idOpinii, klientId, isAdmin, dto, ct);
         return NoContent();
     }
     
