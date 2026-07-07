@@ -8,6 +8,7 @@ using SklepGrovly;
 using SklepGrovly.Exceptions;
 using SklepGrovly.Services.Authorization;
 using SklepGrovly.Services.Categories;
+using SklepGrovly.Services.Opinions;
 using SklepGrovly.Services.Orders;
 using SklepGrovly.Services.Products;
 
@@ -76,6 +77,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategorieService, CategorieService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOpinionService, OpinionService>();
 
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
