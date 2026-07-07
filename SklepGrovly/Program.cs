@@ -10,6 +10,7 @@ using SklepGrovly.Services.Authorization;
 using SklepGrovly.Services.Categories;
 using SklepGrovly.Services.Opinions;
 using SklepGrovly.Services.Orders;
+using SklepGrovly.Services.Payments;
 using SklepGrovly.Services.Products;
 
 
@@ -78,6 +79,7 @@ builder.Services.AddScoped<ICategorieService, CategorieService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOpinionService, OpinionService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
