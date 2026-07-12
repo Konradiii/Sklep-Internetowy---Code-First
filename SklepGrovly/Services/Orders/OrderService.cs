@@ -12,6 +12,8 @@ public class OrderService(ShopDbContext ctx) : IOrderService
 
     public async Task<OrderConfirmationDto> PlaceOrder(int klientId, PlaceOrderDto dto, CancellationToken ct)
     {
+        
+       
 
         var noweZamowienie = new Zamowienie
         {
@@ -29,10 +31,11 @@ public class OrderService(ShopDbContext ctx) : IOrderService
         };
 
         var pozycjeDto = new List<OrderItemConfirmationDto>();
+        
+        
 
         foreach (var pozycja in dto.Pozycje)
         {
-
             var produkt = await ctx.Produkt
                 .FirstOrDefaultAsync(p => p.Id_Produkt == pozycja.Id_Produkt, ct);
 
@@ -51,26 +54,28 @@ public class OrderService(ShopDbContext ctx) : IOrderService
                 throw new ConflictException($"Brak wystarczającej ilości produktu {produkt.Nazwa} na stanie.");
             }
 
+            
+            var cenaJednostkowa = produkt.Znizka.HasValue && produkt.Znizka.Value > 0
+                ? Math.Round(produkt.Cena * (1 - produkt.Znizka.Value / 100m), 2)
+                : produkt.Cena;
 
             noweZamowienie.PozycjaWZamowieniu.Add(new PozycjaWZamowieniu
             {
                 Ilosc = pozycja.Ilosc,
-                CenaZakupu = produkt.Cena,
+                CenaZakupu = cenaJednostkowa,
                 Id_Produkt = produkt.Id_Produkt,
             });
-
 
             pozycjeDto.Add(new OrderItemConfirmationDto
             {
                 Id_Produkt = produkt.Id_Produkt,
                 NazwaProduktu = produkt.Nazwa,
                 Ilosc = pozycja.Ilosc,
-                CenaJednostkowa = produkt.Cena,
-                CenaPozycji = produkt.Cena * pozycja.Ilosc,
+                CenaJednostkowa = cenaJednostkowa,
+                CenaPozycji = cenaJednostkowa * pozycja.Ilosc,
             });
 
             produkt.IloscNaStanie -= pozycja.Ilosc;
-
         }
 
         ctx.Zamowienie.Add(noweZamowienie);
