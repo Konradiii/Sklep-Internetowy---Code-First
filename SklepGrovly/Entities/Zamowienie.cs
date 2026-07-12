@@ -11,6 +11,16 @@ public class Zamowienie
     public int Id_Klient { get; set; }   
     public Klient Klient { get; set; }
     
+    public string ImieOdbiorcy { get; set; }
+    public string NazwiskoOdbiorcy { get; set; }
+    
+    public string Ulica { get; set; }
+    public string NrDomu { get; set; }
+    public string KodPocztowy { get; set; }
+    public string Miejscowosc { get; set; }
+    
+    public string TelefonOdbiorcy { get; set; }
+    
     //laczenie z pozycja zamowienia
     
     public List<PozycjaWZamowieniu> PozycjaWZamowieniu { get; set; } = new();
