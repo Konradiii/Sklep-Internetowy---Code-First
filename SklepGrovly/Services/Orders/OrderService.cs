@@ -18,6 +18,13 @@ public class OrderService(ShopDbContext ctx) : IOrderService
             Id_Klient = klientId,
             DataZamowienia = DateTime.UtcNow,
             Status = StatusZamowienia.Nowe,
+            ImieOdbiorcy = dto.ImieOdbiorcy,
+            NazwiskoOdbiorcy = dto.NazwiskoOdbiorcy,
+            Ulica = dto.Ulica,
+            NrDomu = dto.NrDomu,
+            KodPocztowy = dto.KodPocztowy,
+            Miejscowosc = dto.Miejscowosc,
+            TelefonOdbiorcy = dto.TelefonOdbiorcy,
             PozycjaWZamowieniu = new List<PozycjaWZamowieniu>()
         };
 
