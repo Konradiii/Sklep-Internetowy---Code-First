@@ -11,4 +11,13 @@ public class OrderConfirmationDto
     public List<OrderItemConfirmationDto> Pozycje { get; set; } = new();
 
     public decimal SumaCalkowita { get; set; }       // policzona przez serwer
+    
+    
+    public string ImieOdbiorcy { get; set; }
+    public string NazwiskoOdbiorcy { get; set; }
+    public string Ulica { get; set; }
+    public string NrDomu { get; set; }
+    public string KodPocztowy { get; set; }
+    public string Miejscowosc { get; set; }
+    public string TelefonOdbiorcy { get; set; }
 }

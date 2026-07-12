@@ -87,7 +87,14 @@ public class OrderService(ShopDbContext ctx) : IOrderService
             DataZamowienia = noweZamowienie.DataZamowienia,
             Status = noweZamowienie.Status,
             Pozycje = pozycjeDto,
-            SumaCalkowita = pozycjeDto.Sum(p => p.CenaPozycji)
+            SumaCalkowita = pozycjeDto.Sum(p => p.CenaPozycji),
+            ImieOdbiorcy = noweZamowienie.ImieOdbiorcy,
+            NazwiskoOdbiorcy = noweZamowienie.NazwiskoOdbiorcy,
+            Ulica = noweZamowienie.Ulica,
+            NrDomu = noweZamowienie.NrDomu,
+            KodPocztowy = noweZamowienie.KodPocztowy,
+            Miejscowosc = noweZamowienie.Miejscowosc,
+            TelefonOdbiorcy = noweZamowienie.TelefonOdbiorcy,
         };
     }
 
