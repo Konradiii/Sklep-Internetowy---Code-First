@@ -8,4 +8,6 @@ public class OrderListItemDto
     public DateTime DataZamowienia { get; set; }
     public StatusZamowienia Status { get; set; }
     public decimal SumaCalkowita { get; set; }
+    
+    public List<string> NazwyProduktow { get; set; } = new(); 
 }

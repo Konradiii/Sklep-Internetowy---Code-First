@@ -210,7 +210,8 @@ public class OrderService(ShopDbContext ctx) : IOrderService
                 Id_Zamowienie = p.Id_Zamowienie,
                 DataZamowienia = p.DataZamowienia,
                 Status = p.Status,
-                SumaCalkowita = p.PozycjaWZamowieniu.Sum(p=> p.Ilosc * p.CenaZakupu)
+                SumaCalkowita = p.PozycjaWZamowieniu.Sum(p=> p.Ilosc * p.CenaZakupu),
+                NazwyProduktow = p.PozycjaWZamowieniu.Select(x => x.Produkt.Nazwa).ToList()
             }).ToListAsync(ct);
         
         return lista;
