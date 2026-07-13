@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
 using SklepGrovly.DTOs.Orders;
 using SklepGrovly.Entities;
 using SklepGrovly.Enums;
@@ -96,6 +97,108 @@ public class OrderService(ShopDbContext ctx) : IOrderService
             Miejscowosc = noweZamowienie.Miejscowosc,
             TelefonOdbiorcy = noweZamowienie.TelefonOdbiorcy,
         };
+    }
+
+
+    public async Task<OrderConfirmationDto> PlaceGuestOrder(GuestOrderDto dto, CancellationToken ct)
+    {
+
+        var gosc = await ctx.Set<Gosc>().FirstOrDefaultAsync(e => e.Email == dto.Email, ct);
+
+        if (gosc == null)
+        {
+            var losoweHaslo = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+
+            gosc = new Gosc
+            {
+                Email = dto.Email,
+                Imie = dto.ImieOdbiorcy,
+                Nazwisko = dto.NazwiskoOdbiorcy,
+                NrTelefonu = dto.TelefonOdbiorcy,
+                Haslo = losoweHaslo,
+                DataUrodzenia = new DateTime(2000, 1, 1),  
+            };
+            ctx.Set<Gosc>().Add(gosc);
+        }
+      var noweZamowienie = new Zamowienie
+    {
+        Osoba = gosc,
+        DataZamowienia = DateTime.UtcNow,
+        Status = StatusZamowienia.Nowe,
+        ImieOdbiorcy = dto.ImieOdbiorcy,
+        NazwiskoOdbiorcy = dto.NazwiskoOdbiorcy,
+        Ulica = dto.Ulica,
+        NrDomu = dto.NrDomu,
+        KodPocztowy = dto.KodPocztowy,
+        Miejscowosc = dto.Miejscowosc,
+        TelefonOdbiorcy = dto.TelefonOdbiorcy,
+        PozycjaWZamowieniu = new List<PozycjaWZamowieniu>()
+    };
+      
+    var pozycjeDto = new List<OrderItemConfirmationDto>();
+
+    foreach (var pozycja in dto.Pozycje)
+    {
+        var produkt = await ctx.Produkt
+            .FirstOrDefaultAsync(p => p.Id_Produkt == pozycja.Id_Produkt, ct);
+
+        if (produkt == null)
+            throw new NotFoundException("Nie ma takiego produktu!");
+
+        if (!produkt.CzyAktywny)
+            throw new ConflictException($"Produkt {produkt.Nazwa} jest nieaktywny.");
+
+        if (produkt.IloscNaStanie < pozycja.Ilosc)
+            throw new ConflictException($"Brak wystarczającej ilości produktu {produkt.Nazwa} na stanie.");
+
+        var znizka = produkt.Znizka ?? 0;
+        var cenaJednostkowa = znizka > 0
+            ? Math.Round(produkt.Cena * (1 - znizka / 100m), 2)
+            : produkt.Cena;
+
+        noweZamowienie.PozycjaWZamowieniu.Add(new PozycjaWZamowieniu
+        {
+            Ilosc = pozycja.Ilosc,
+            CenaZakupu = cenaJednostkowa,
+            Id_Produkt = produkt.Id_Produkt,
+        });
+
+        pozycjeDto.Add(new OrderItemConfirmationDto
+        {
+            Id_Produkt = produkt.Id_Produkt,
+            NazwaProduktu = produkt.Nazwa,
+            Ilosc = pozycja.Ilosc,
+            CenaJednostkowa = cenaJednostkowa,
+            CenaPozycji = cenaJednostkowa * pozycja.Ilosc,
+        });
+
+        produkt.IloscNaStanie -= pozycja.Ilosc;
+    }
+
+    ctx.Zamowienie.Add(noweZamowienie);
+    await ctx.SaveChangesAsync(ct);
+
+    
+        return new OrderConfirmationDto
+        {
+            Id_Zamowienie = noweZamowienie.Id_Zamowienie,
+            DataZamowienia = noweZamowienie.DataZamowienia,
+            Status = noweZamowienie.Status,
+            Pozycje = pozycjeDto,
+            SumaCalkowita = pozycjeDto.Sum(p => p.CenaPozycji),
+            ImieOdbiorcy = noweZamowienie.ImieOdbiorcy,
+            NazwiskoOdbiorcy = noweZamowienie.NazwiskoOdbiorcy,
+            Ulica = noweZamowienie.Ulica,
+            NrDomu = noweZamowienie.NrDomu,
+            KodPocztowy = noweZamowienie.KodPocztowy,
+            Miejscowosc = noweZamowienie.Miejscowosc,
+            TelefonOdbiorcy = noweZamowienie.TelefonOdbiorcy,
+        };
+
+
+
+
+
     }
 
     public async Task<List<OrderListItemDto>> GetAllOrdersByClient(int klientId, CancellationToken ct)

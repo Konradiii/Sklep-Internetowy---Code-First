@@ -8,6 +8,8 @@ public interface IOrderService
 
     Task<OrderConfirmationDto> PlaceOrder(int klientId, PlaceOrderDto dto, CancellationToken ct);
     
+    Task<OrderConfirmationDto> PlaceGuestOrder(GuestOrderDto dto, CancellationToken ct);
+    
     Task<List<OrderListItemDto>> GetAllOrdersByClient(int klientId, CancellationToken ct);
     
     Task<List<OrderListItemDto>> GetAllOrders(CancellationToken ct);

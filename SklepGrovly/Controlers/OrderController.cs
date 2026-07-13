@@ -24,6 +24,14 @@ public class OrderController(IOrderService service) : ControllerBase
         
         return Ok(wynik);
     }
+    
+    [HttpPost("guest")]
+    [EndpointDescription("Złożenie zamówienia jako gość (bez konta).")]
+    public async Task<IActionResult> PlaceGuestOrder(GuestOrderDto dto, CancellationToken ct)
+    {
+        var wynik = await service.PlaceGuestOrder(dto, ct);
+        return Ok(wynik);
+    }
 
 
     [HttpGet("me")]
