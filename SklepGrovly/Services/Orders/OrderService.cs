@@ -17,7 +17,7 @@ public class OrderService(ShopDbContext ctx) : IOrderService
 
         var noweZamowienie = new Zamowienie
         {
-            Id_Klient = klientId,
+            Id_Osoba = klientId,
             DataZamowienia = DateTime.UtcNow,
             Status = StatusZamowienia.Nowe,
             ImieOdbiorcy = dto.ImieOdbiorcy,
@@ -101,7 +101,7 @@ public class OrderService(ShopDbContext ctx) : IOrderService
     public async Task<List<OrderListItemDto>> GetAllOrdersByClient(int klientId, CancellationToken ct)
     {
         var lista = await ctx.Zamowienie
-            .Where(p => p.Id_Klient == klientId)
+            .Where(p => p.Id_Osoba == klientId)
             .Select(p => new OrderListItemDto
             {
                 Id_Zamowienie = p.Id_Zamowienie,
@@ -137,7 +137,7 @@ public class OrderService(ShopDbContext ctx) : IOrderService
                     .Select(p=> new OrderDetailsDto
                     {
                         
-                        Id_Klient = p.Id_Klient,
+                        Id_Klient = p.Id_Osoba,
                         Id_Zamowienie = p.Id_Zamowienie,
                         DataZamowienia = p.DataZamowienia,
                         Status = p.Status,
@@ -192,7 +192,7 @@ public class OrderService(ShopDbContext ctx) : IOrderService
             if (zamowienie == null)
                 throw new NotFoundException("Nie ma takiego zamowienia.");
             
-            if (!isAdmin && zamowienie.Id_Klient != klientId)
+            if (!isAdmin && zamowienie.Id_Osoba != klientId)
                 throw new NotFoundException("Nie ma takiego zamówienia.");
             
             if (zamowienie.Status == StatusZamowienia.Anulowane)

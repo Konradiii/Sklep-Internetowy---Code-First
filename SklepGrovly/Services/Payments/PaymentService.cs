@@ -20,7 +20,7 @@ public class PaymentService(ShopDbContext ctx) : IPaymentService
         {
             throw new NotFoundException("Takie zamowienie nie istnieje");
         }
-        if (klientId != zamowienie.Id_Klient)
+        if (klientId != zamowienie.Id_Osoba)
         {
             throw new NotFoundException("Takie zamowienie nie istnieje");
         }

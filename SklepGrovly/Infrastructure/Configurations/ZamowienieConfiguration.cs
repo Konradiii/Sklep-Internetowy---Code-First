@@ -39,9 +39,9 @@ public class ZamowienieConfiguration : IEntityTypeConfiguration<Zamowienie>
     
         
 
-        builder.HasOne(p => p.Klient)
+        builder.HasOne(p => p.Osoba)
             .WithMany(p => p.Zamowienia)
-            .HasForeignKey(e => e.Id_Klient)
+            .HasForeignKey(e => e.Id_Osoba)
             .OnDelete(DeleteBehavior.Restrict);
         
         

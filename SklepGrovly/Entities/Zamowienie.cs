@@ -8,8 +8,8 @@ public class Zamowienie
     public DateTime DataZamowienia { get; set; }
     public StatusZamowienia Status { get; set; }
     
-    public int Id_Klient { get; set; }   
-    public Klient Klient { get; set; }
+    public int Id_Osoba { get; set; }   
+    public Osoba Osoba { get; set; }
     
     public string ImieOdbiorcy { get; set; }
     public string NazwiskoOdbiorcy { get; set; }

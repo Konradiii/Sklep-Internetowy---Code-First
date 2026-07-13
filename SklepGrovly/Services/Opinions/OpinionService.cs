@@ -13,7 +13,7 @@ public class OpinionService(ShopDbContext ctx) : IOpinionService
 
         var kupil = await ctx.Zamowienie
             .Where(e => e.Status == StatusZamowienia.Dostarczone)
-            .Where(e => e.Id_Klient == klientId)
+            .Where(e => e.Id_Osoba == klientId)
             .Where(p => p.PozycjaWZamowieniu.Any(e => e.Id_Produkt == dto.Id_Produkt))
             .AnyAsync(ct);
 

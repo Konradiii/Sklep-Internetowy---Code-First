@@ -32,7 +32,8 @@ public class OsobaConfiguration : IEntityTypeConfiguration<Osoba>
         
         builder.HasDiscriminator<string>("TypOsoby")
             .HasValue<Klient>("Klient")
-            .HasValue<Administrator>("Administrator");
+            .HasValue<Administrator>("Administrator")
+            .HasValue<Gosc>("Gosc");  
     }
     
 }

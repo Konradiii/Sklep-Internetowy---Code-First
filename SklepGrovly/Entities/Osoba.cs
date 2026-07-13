@@ -10,6 +10,8 @@ public abstract class Osoba
     public string NrTelefonu { get; set; }
     public DateTime DataUrodzenia  { get; set; }
     
+    public List<Zamowienie> Zamowienia { get; set; } = new();
+    
     public int Wiek => DateTime.Now.Year - DataUrodzenia.Year;
     
     public ICollection<RefreshToken> RefreshTokens {get; set;} = new List<RefreshToken>();
