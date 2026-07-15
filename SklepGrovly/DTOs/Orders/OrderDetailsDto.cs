@@ -8,6 +8,15 @@ public class OrderDetailsDto
     public int Id_Zamowienie { get; set; }
     public DateTime DataZamowienia { get; set; }
     public StatusZamowienia Status { get; set; }
+    
+    
+    public string ImieOdbiorcy { get; set; }
+    public string NazwiskoOdbiorcy { get; set; }
+    public string Ulica { get; set; }
+    public string NrDomu { get; set; }
+    public string KodPocztowy { get; set; }
+    public string Miejscowosc { get; set; }
+    public string TelefonOdbiorcy { get; set; }
 
     public List<OrderItemDto> Pozycje { get; set; } = new();
 

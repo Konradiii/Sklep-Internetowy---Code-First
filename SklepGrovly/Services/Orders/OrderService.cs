@@ -245,6 +245,13 @@ public class OrderService(ShopDbContext ctx) : IOrderService
                         Id_Zamowienie = p.Id_Zamowienie,
                         DataZamowienia = p.DataZamowienia,
                         Status = p.Status,
+                        ImieOdbiorcy = p.ImieOdbiorcy,
+                        NazwiskoOdbiorcy = p.NazwiskoOdbiorcy,
+                        Ulica = p.Ulica,
+                        NrDomu = p.NrDomu,
+                        KodPocztowy = p.KodPocztowy,
+                        Miejscowosc = p.Miejscowosc,
+                        TelefonOdbiorcy = p.TelefonOdbiorcy,
                         Pozycje = p.PozycjaWZamowieniu.Select(poz=>new OrderItemDto
                         {
                             Id_Produkt = poz.Id_Produkt,
