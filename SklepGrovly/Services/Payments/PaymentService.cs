@@ -33,9 +33,11 @@ public class PaymentService(ShopDbContext ctx) : IPaymentService
             throw new ConflictException("To zamowienie jest anulowane");
         }
         
-        var istniejePlatnosc = await ctx.Platnosc.AnyAsync(p=>
-            p.Id_Zamowienie == orderId && (p.StatusPlatnosci == StatusPlatnosci.Oczekujaca ||
-            p.StatusPlatnosci == StatusPlatnosci.Zrealizowana), ct);
+        var istniejePlatnosc = await ctx.Platnosc.AnyAsync(p =>
+            p.Id_Zamowienie == orderId && 
+            (p.StatusPlatnosci == StatusPlatnosci.Zrealizowana ||
+             (p.StatusPlatnosci == StatusPlatnosci.Oczekujaca && 
+              p.DataPlatnosci > DateTime.UtcNow.AddMinutes(-30))), ct);
         
         if (istniejePlatnosc)
             throw new ConflictException("Płatność za to zamówienie już istnieje.");
@@ -59,7 +61,7 @@ public class PaymentService(ShopDbContext ctx) : IPaymentService
         {
             Id_Platnosc = platnosc.Id_Platnosc,
             Status = platnosc.StatusPlatnosci,
-            LinkDoPlatnosci = $"http://mock-payment/pay/{platnosc.IdZBramkiPlatniczej}"
+            LinkDoPlatnosci = $"http://localhost:3000/mock-platnosc/{platnosc.IdZBramkiPlatniczej}"
         };
 
     }

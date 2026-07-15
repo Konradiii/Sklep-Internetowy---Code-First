@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SklepGrovly.DTOs.Payments;
 using SklepGrovly.Services.Payments;
 
 namespace SklepGrovly.Controlers;
@@ -23,9 +24,9 @@ public class PaymentController(IPaymentService service) : ControllerBase
     [HttpPost("webhook")]
     [AllowAnonymous]                   
     [EndpointSummary("Webhook płatności (symulacja bramki)")]
-    public async Task<IActionResult> HandleWebhook(string idBramki, bool sukces, CancellationToken ct)
+    public async Task<IActionResult> HandleWebhook([FromBody] WebhookDto dto, CancellationToken ct)
     {
-        await service.HandleWebhook(idBramki, sukces, ct);
+        await service.HandleWebhook(dto.IdBramki , dto.Sukces, ct);
         return Ok();
     }
     
