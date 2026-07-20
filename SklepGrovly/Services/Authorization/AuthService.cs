@@ -217,6 +217,8 @@ public async Task ChangePassword(int userId, ChangePasswordDto dto, Cancellation
         if (user == null)
             throw new NotFoundException("Nie znaleziono użytkownika.");
         
+        user.Imie = dto.Imie;
+        user.Nazwisko = dto.Nazwisko;
         user.NrTelefonu = dto.NrTelefonu;
         
         await ctx.SaveChangesAsync(ct);
