@@ -30,4 +30,12 @@ public class PaymentController(IPaymentService service) : ControllerBase
         return Ok();
     }
     
+    [HttpGet("mock/{idBramki}")]
+    [AllowAnonymous]
+    [EndpointSummary("Dane płatności dla symulowanej bramki")]
+    public async Task<IActionResult> GetMockPaymentInfo(string idBramki, CancellationToken ct)
+    {
+        return Ok(await service.GetMockPaymentInfo(idBramki, ct));
+    }
+    
 }

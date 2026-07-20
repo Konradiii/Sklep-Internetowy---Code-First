@@ -94,5 +94,22 @@ public class PaymentService(ShopDbContext ctx) : IPaymentService
         
     }
     
+    public async Task<MockPaymentInfoDto> GetMockPaymentInfo(string idBramki, CancellationToken ct)
+    {
+        var platnosc = await ctx.Platnosc
+            .FirstOrDefaultAsync(p => p.IdZBramkiPlatniczej == idBramki, ct);
+
+        if (platnosc == null)
+            throw new NotFoundException("Nie znaleziono płatności.");
+
+        return new MockPaymentInfoDto
+        {
+            IdBramki = platnosc.IdZBramkiPlatniczej!,
+            Kwota = platnosc.KwotaPlatnosci,
+            Id_Zamowienie = platnosc.Id_Zamowienie,
+            Status = platnosc.StatusPlatnosci,
+        };
+    }
+    
     
 }
