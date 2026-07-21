@@ -173,6 +173,56 @@ public class OrderServiceTests
 
 
     }
+
+    [Fact]
+    public async Task PlaceOrder_ZamowienieZamrazaCeneAktualna_ZwroconaZostajeCenaZakupu()
+    {
+        var options = new DbContextOptionsBuilder<ShopDbContext>()
+            .UseInMemoryDatabase(databaseName:Guid.NewGuid().ToString())
+            .Options;
+        
+        using var ctx = new ShopDbContext(options);
+        
+        var produkt = new Produkt 
+        { 
+            Id_Produkt = 1,
+            Nazwa = "test",
+            Cena = 100m,
+            Znizka = 20,
+            CzyAktywny = true,
+            IloscNaStanie = 100,  
+        };
+        ctx.Produkt.Add(produkt);
+        
+        var user1 = new Klient{ Id_Osoba = 1,Imie = "test1", Nazwisko = "test1", Email = "test@email.pl", Haslo = "sadasdas", NrTelefonu = "231123123"};
+        ctx.Osoba.Add(user1);
+        await ctx.SaveChangesAsync();
+
+        var order = new PlaceOrderDto
+        {
+            ImieOdbiorcy = "test2",
+            NazwiskoOdbiorcy =  "test2",
+            Ulica = "test",
+            NrDomu = "12312312",
+            KodPocztowy = "test2",
+            Miejscowosc = "test2",
+            TelefonOdbiorcy = "222222",
+            Pozycje = new List<PlaceOrderItemsDto>
+            {
+                new PlaceOrderItemsDto{ Id_Produkt = 1, Ilosc = 1}
+                
+            }
+        };
+        var service = new OrderService(ctx);
+        
+        var result = await service.PlaceOrder(1,order, CancellationToken.None);
+
+        var pozycja = ctx.Set<PozycjaWZamowieniu>().First();
+        
+        Assert.Equal(80m, pozycja.CenaZakupu);
+
+
+    }
     
     
     
