@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SklepGrovly.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9cc71014a937123f7436488fbc56dfd47ccdf1b2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b2633c146018b72934b21ad065d1897da8a6afc3")]
 [assembly: System.Reflection.AssemblyProductAttribute("SklepGrovly.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SklepGrovly.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
