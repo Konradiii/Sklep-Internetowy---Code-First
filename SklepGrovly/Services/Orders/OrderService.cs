@@ -4,6 +4,7 @@ using SklepGrovly.DTOs.Orders;
 using SklepGrovly.Entities;
 using SklepGrovly.Enums;
 using SklepGrovly.Exceptions;
+using SklepGrovly.Utils;
 
 namespace SklepGrovly.Services.Orders;
 
@@ -55,10 +56,8 @@ public class OrderService(ShopDbContext ctx) : IOrderService
                 throw new ConflictException($"Brak wystarczającej ilości produktu {produkt.Nazwa} na stanie.");
             }
 
-            
-            var cenaJednostkowa = produkt.Znizka.HasValue && produkt.Znizka.Value > 0
-                ? Math.Round(produkt.Cena * (1 - produkt.Znizka.Value / 100m), 2)
-                : produkt.Cena;
+
+            var cenaJednostkowa = CenyHelper.ObliczCenePoZnizce(produkt.Cena, produkt.Znizka);
 
             noweZamowienie.PozycjaWZamowieniu.Add(new PozycjaWZamowieniu
             {
@@ -150,11 +149,8 @@ public class OrderService(ShopDbContext ctx) : IOrderService
 
         if (produkt.IloscNaStanie < pozycja.Ilosc)
             throw new ConflictException($"Brak wystarczającej ilości produktu {produkt.Nazwa} na stanie.");
-
-        var znizka = produkt.Znizka ?? 0;
-        var cenaJednostkowa = znizka > 0
-            ? Math.Round(produkt.Cena * (1 - znizka / 100m), 2)
-            : produkt.Cena;
+        
+        var cenaJednostkowa = CenyHelper.ObliczCenePoZnizce(produkt.Cena, produkt.Znizka);
 
         noweZamowienie.PozycjaWZamowieniu.Add(new PozycjaWZamowieniu
         {
