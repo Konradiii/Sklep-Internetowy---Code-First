@@ -7,5 +7,6 @@
     &lt;TestId&gt;xUnit::804B3E6E-09E3-4882-8E5A-0AF19FD159F8::net10.0::SklepGrovly.Tests.PaymentServiceTests.HandleWebhook_SukcesNaOczekujacej_UstawiaZrealizowanaIOplacone&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::804B3E6E-09E3-4882-8E5A-0AF19FD159F8::net10.0::SklepGrovly.Tests.PaymentServiceTests.HandleWebhook_SprawdzenieStraznikowStatusu_StatuPlatnosciOdrzuconaStatusSuccessuTrueNieZmieniaStatusuPlatnosciNaZrealizowana&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::804B3E6E-09E3-4882-8E5A-0AF19FD159F8::net10.0::SklepGrovly.Tests.PaymentServiceTests.HandleWebhook_PlatnoscOdrzucona_NieZmieniaStatusu&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::804B3E6E-09E3-4882-8E5A-0AF19FD159F8::net10.0::SklepGrovly.Tests.OrderGuestUserTests.PlaceGuestOrder_ZnalezienieIstniejacegoUzytkownika_PodpiecieZamowieniaPodIstniejacy&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
